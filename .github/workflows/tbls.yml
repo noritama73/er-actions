@@ -1,6 +1,8 @@
 name: Generate DB Schema Document
 on:
   pull_request:
+    paths:
+      - "migrations/**"
     types: [opened, reopened, synchronize, ready_for_review]
 
 jobs:
@@ -8,17 +10,35 @@ jobs:
     if: github.event.pull_request.draft == false
     name: "tbls"
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7
+        ports:
+          - "3306:3306"
+        options: >-
+          --health-cmd "mysqladmin ping -h localhost"
+          --health-interval 20s
+          --health-timeout 10s
+          --health-retries 10
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: sakila
     steps:
       - name: checkout
         uses: actions/checkout@v3
+      - name: set up go
+        uses: actions/setup-go@v3
       - name: create database
+        run: mysql -h 127.0.0.1 -P 3306 -u root -proot -e "CREATE DATABASE IF NOT EXISTS sakila DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin"
+      - name: mysql migrate
         run: |
-          make setup_db && sleep 10
+          go install github.com/rubenv/sql-migrate/sql-migrate@latest
+          sql-migrate up -env="development"
       - name: install tbls then generate DB schema document
         run: source <(curl https://raw.githubusercontent.com/k1LoW/tbls/main/use) && make schema
       - uses: dev-hato/actions-diff-pr-management@v1.1.1
         with:
-          github-token: ${{ secrets.CI_TOKEN }}
+          github-token: ${{secrets.CI_TOKEN}}
           branch-name-prefix: fix-tbls
           pr-title-prefix: DB schema document修正
           pr-description-prefix: DB schema documentを修正しました。
