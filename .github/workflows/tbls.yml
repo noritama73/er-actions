@@ -1,0 +1,41 @@
+name: Generate DB Schema Document
+on:
+  pull_request:
+    paths:
+      - "migrations/**"
+    types: [opened, reopened, synchronize, ready_for_review]
+
+jobs:
+  tbls:
+    if: github.event.pull_request.draft == false
+    name: "tbls"
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7
+        ports:
+          - "3306:3306"
+        options: >-
+          --health-cmd "mysqladmin ping -h localhost"
+          --health-interval 20s
+          --health-timeout 10s
+          --health-retries 10
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: root
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: set up go
+        uses: actions/setup-go@v3
+      - name: create database
+        run: |
+          docker-compose -f ${{ github.workspace }}/docker-compose.yml up -d
+      - name: install tbls then generate DB schema document
+        run: source <(curl https://raw.githubusercontent.com/k1LoW/tbls/main/use) && make gen/tbls
+      - uses: dev-hato/actions-diff-pr-management@v1.1.1
+        with:
+          github-token: ${{ secrets.CI_TOKEN }}
+          branch-name-prefix: fix-tbls
+          pr-title-prefix: DB schema document修正
+          pr-description-prefix: DB schema documentを修正しました。

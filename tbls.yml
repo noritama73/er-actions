@@ -1,0 +1,3 @@
+dsn: mysql://root:root@127.0.0.1:3306/sakila
+docPath: doc/schema
+disableOutputSchema: true
