@@ -32,8 +32,7 @@ jobs:
         run: mysql -h 127.0.0.1 -P 3306 -u root -proot -e "CREATE DATABASE IF NOT EXISTS sakila DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin"
       - name: mysql migrate
         run: |
-          go install github.com/rubenv/sql-migrate/sql-migrate@latest
-          sql-migrate up -env="development"
+          go install github.com/rubenv/sql-migrate/sql-migrate@latest && sql-migrate up -env="development"
       - name: install tbls then generate DB schema document
         run: source <(curl https://raw.githubusercontent.com/k1LoW/tbls/main/use) && make schema
       - uses: dev-hato/actions-diff-pr-management@v1.1.1

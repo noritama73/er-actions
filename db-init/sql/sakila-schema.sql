@@ -50,6 +50,8 @@ CREATE TABLE actor (
   KEY idx_actor_last_name (last_name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+
+
 --
 -- Table structure for table `address`
 --
