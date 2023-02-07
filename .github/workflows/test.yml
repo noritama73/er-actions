@@ -1,0 +1,18 @@
+name: test
+on:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: gen diff
+        run: touch test.txt && echo "hoge" > test.txt
+      - uses: dev-hato/actions-diff-pr-management@v1.1.1
+        with:
+          github-token: ${{secrets.CI_TOKEN}}
+          branch-name-prefix: fix-tbls
+          pr-title-prefix: DB schema document修正
+          pr-description-prefix: DB schema documentを修正しました。
