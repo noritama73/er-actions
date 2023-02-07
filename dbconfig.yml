@@ -1,0 +1,5 @@
+development:
+    dialect: mysql
+    datasource: root:root@tcp(127.0.0.1)/sakila?parseTime=true
+    dir: migrations
+    table: migrations
