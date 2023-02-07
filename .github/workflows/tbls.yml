@@ -15,7 +15,7 @@ jobs:
         uses: actions/setup-go@v3
       - name: create database
         run: |
-          docker-compose -f ${{ github.workspace }}/docker-compose.yml up -d
+          make setup_db
       - name: install tbls then generate DB schema document
         run: source <(curl https://raw.githubusercontent.com/k1LoW/tbls/main/use) && make gen/tbls
       - uses: dev-hato/actions-diff-pr-management@v1.1.1
