@@ -1,8 +1,6 @@
 name: Generate DB Schema Document
 on:
   pull_request:
-    paths:
-      - "migrations/**"
     types: [opened, reopened, synchronize, ready_for_review]
 
 jobs:
